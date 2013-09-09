@@ -4,10 +4,17 @@ import requests
 import simplejson as json
 from HashTable import HashTable,KeyValue,Index
 import couchdb
+from couchdb.mapping import TextField, IntegerField, DateTimeField, Document, Mapping, DictField, ListField, DecimalField
 
 MAX_DEPTH = 3
 
-class Document(object):
+
+class Content(Document):	
+	termo = TextField()
+	urls = ListField(DictField(Mapping.build(url = TextField(), frequencia = DecimalField())))
+
+
+class Document(object):	
 
 	def __init__(self, url, texto):
 		self.url = url

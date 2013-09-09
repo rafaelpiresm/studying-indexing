@@ -1,7 +1,11 @@
+from __future__ import division
 import couchdb
-from WebCrawler import MrCrawler
+from WebCrawler import MrCrawler, Content
 from HashTable import Index
 import simplejson as json
+import nltk
+
+
 
 SERVER_COUCHDB = 'http://208.68.38.13/couchdb'
 
@@ -18,9 +22,13 @@ def create_index():
 
 
 print 'Iniciando crawler...'
-url = 'http://www.abstracaocoletiva.com.br'
-raiz = 'abstracaocoletiva.com.br'
-databaseName = 'abstracaocoletiva'
+'''url = 'http://omelete.uol.com.br/'
+raiz = 'omelete.uol.com.br'
+databaseName = 'omelete'''
+url = "http://www.abstracaocoletiva.com.br"
+raiz = "abstracaocoletiva.com.br"
+databaseName = "abstracaocoletiva"
+
 
 crawler = MrCrawler(url,raiz)
 crawler.crawl()
@@ -36,9 +44,18 @@ db = getDatabase(databaseName)
 print 'Server OK!'
 print 'Criando indices no CouchDB...'
 
-for l,k in newIndex.table.lista.items():
-	d = {}
-	d[l] = k
-	db.save(json.loads(json.dumps(d)))
+for doc in newIndex.table.lista.items():
+	content = Content()
+	termo = doc[0]
+	content.termo = termo
+	tc = nltk.TextCollection(doc[1])
+	for d in doc[1]:				
+		tf = tc.tf_idf(termo,d)
+		content.urls.append(url=d,frequencia=tf)
+	try:
+		content.store(db)
+	except:
+		print 'Nao foi possivel salvar o termo: ' + str(doc[0])
+ 
 
 print 'Pronto! =]]'

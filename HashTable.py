@@ -9,6 +9,8 @@ class Index(object):
 	def create_index(self, documentos):
 		for d in documentos:
 			tokens = nltk.wordpunct_tokenize(nltk.clean_html(d.texto))
+			tokens = [token.lower() for token in tokens]
+			tokens = set(tokens)
 			for t in set(tokens):
 				chave = KeyValue(t.lower(),d.url)
 				if self.table.lookup(chave):
