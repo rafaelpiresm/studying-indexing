@@ -52,7 +52,7 @@ for doc in newIndex.table.lista.items():
 	try:
 		content.store(db)
 	except:
-		print 'Nao foi possivel salvar o termo: ' + str(doc[0])
+		print 'Nao foi possivel salvar o termo: ' + termo
  
 
 print 'Pronto! =]]'
