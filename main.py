@@ -22,9 +22,6 @@ def create_index():
 
 
 print 'Iniciando crawler...'
-'''url = 'http://omelete.uol.com.br/'
-raiz = 'omelete.uol.com.br'
-databaseName = 'omelete'''
 url = "http://www.abstracaocoletiva.com.br"
 raiz = "abstracaocoletiva.com.br"
 databaseName = "abstracaocoletiva"
