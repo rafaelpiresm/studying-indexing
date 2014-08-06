@@ -71,7 +71,7 @@ with open('/studying-indexing/lastclick_partner.csv','r') as csv_dw:
 		for l in reader_dw:
 			lista_ga.append(l)
 
-source = {lista_ga;lista_dw}
+source = {lista_ga:lista_dw}
 s = mincemeat.Server()
 s.datasource = source
 s.mapfn = mapfn
