@@ -3,15 +3,9 @@ from BeautifulSoup import BeautifulSoup as Soup
 import requests
 import simplejson as json
 from HashTable import HashTable,KeyValue,Index
-import couchdb
-from couchdb.mapping import TextField, IntegerField, DateTimeField, Document, Mapping, DictField, ListField, DecimalField
-
-MAX_DEPTH = 3
 
 
-class Content(Document):	
-	termo = TextField()
-	urls = ListField(DictField(Mapping.build(url = TextField(), frequencia = DecimalField())))
+MAX_DEPTH = 1000
 
 
 class Document(object):	
@@ -46,20 +40,23 @@ class MrCrawler(object):
 			linkAVisitar = self.links.pop()
 			if linkAVisitar is not None:
 				if linkAVisitar  not in self.linksVisitados:
-					print 'Crawling ' + str(linkAVisitar) + ' ...'				
 					try:
-						response = requests.get(linkAVisitar)
-						self.depth += 1
-						self.adicionaALinksVisitados(linkAVisitar)
-						if 'image/jpeg' not in str(response.headers['content-type']):					
-							self.getLinks(str(response.content))
-							novoTexto = nltk.clean_html(response.content.decode('utf-8'))
-							self.textos.append(novoTexto.encode('utf-8'))			
-							novoDocumento = Document(linkAVisitar,novoTexto)
-							self.documentos.append(novoDocumento)
+						print 'Crawling ' + str(linkAVisitar).decode('utf-8') + ' ...'				
+						try:
+							response = requests.get(linkAVisitar)
+							self.depth += 1
+							self.adicionaALinksVisitados(linkAVisitar)
+							if 'image/jpeg' not in str(response.headers['content-type']):					
+								self.getLinks(str(response.content))
+								novoTexto = nltk.clean_html(response.content.decode('utf-8'))
+								self.textos.append(novoTexto.encode('utf-8'))			
+								novoDocumento = Document(linkAVisitar,novoTexto)
+								self.documentos.append(novoDocumento)
+						except:
+							print 'Mais uma tentativa de conexao...'
+							self.crawl()
 					except:
-						print 'Mais uma tentativa de conexao...'
-						self.crawl()
+						print 'Pau na decodificacao de um link...' + linkAVisitar
 				self.crawl()
 		return
 
