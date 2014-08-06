@@ -42,7 +42,7 @@ def mapfn(lista_ga,lista_dw):
 		orders_in_dw = filter(lambda x: x[0] == order_id_on_ga, lista_dw)
 		for line_dw in orders_in_dw:
 			order_id_on_dw = line_dw[0]								
-				yield order_id_on_ga, dict({line_dw[2]:1})
+			yield order_id_on_ga, dict({line_dw[2]:1})
 
 def reducefn(key,value):		
 	r = {}
