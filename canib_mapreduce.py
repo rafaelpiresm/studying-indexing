@@ -33,22 +33,16 @@ CODE_PER_PARTNERS = {
 	'1111111111':'dyn1294241770'
 }
 
-
-
-PATH = 'C:\\Kaggle\\dafiti\\analises\\canibalizacao\\ga\\*'
-
-def mapfn(key,value):
-	import csv
-	with open(key,'r') as csv_ga:
-		reader_ga = csv.reader(csv_ga, delimiter=';')
-		reader_ga.next()		
-		for line_ga in reader_ga:
-			order_id_on_ga = line_ga[0]									
-			list_partners = {}
-			for line_dw in value:
-				order_id_on_dw = line_dw[0]					
-				if order_id_on_ga == order_id_on_dw:																	
-					yield order_id_on_ga, dict({line_dw[2]:1})
+#"ORDER_ID";"REVENUE_BOB";"PARTNER_ID";"PARTNER"
+def mapfn(lista_ga,lista_dw):
+	import csv		
+	for line_ga in reader_ga:
+		order_id_on_ga = line_ga[0]									
+		list_partners = {}
+		orders_in_dw = filter(lambda x: x[0] == order_id_on_ga, lista_dw)
+		for line_dw in orders_in_dw:
+			order_id_on_dw = line_dw[0]								
+				yield order_id_on_ga, dict({line_dw[2]:1})
 
 def reducefn(key,value):		
 	r = {}
@@ -60,22 +54,24 @@ def reducefn(key,value):
 				r[v[0]] += v[1]			
 	return key, r
 	
-	
-
-lista = []
-with open('canibalizacao.csv','r') as csv_dw:
-		reader_dw = csv.reader(csv_dw, delimiter=';')
-		reader_dw.next()				
-		for l in reader_dw:
-			lista.append(l)
-
-text_files = glob.glob(PATH)
-source = dict((file_name,lista)
-			for file_name in text_files)
-
 
 start = time.time()
 
+lista_dw = []
+with open('/studying-indexing/canibalizacao.csv','r') as csv_dw:
+		reader_dw = csv.reader(csv_dw, delimiter=';')
+		reader_dw.next()				
+		for l in reader_dw:
+			lista_dw.append(l)
+
+lista_ga = []
+with open('/studying-indexing/lastclick_partner.csv','r') as csv_dw:
+		reader_dw = csv.reader(csv_dw, delimiter=';')
+		reader_dw.next()				
+		for l in reader_dw:
+			lista_ga.append(l)
+
+source = {lista_ga;lista_dw}
 s = mincemeat.Server()
 s.datasource = source
 s.mapfn = mapfn
@@ -83,12 +79,12 @@ s.reducefn = reducefn
 results = s.run_server(password="changeme")
 end = time.time()
 
-for r in results:
-	print r
+for k,v in results.iteritems():
+	print k,v
 # write python dict to a file
-'''output = open('myfile.pkl', 'wb')
+output = open('/studying-indexing/myfile.pkl', 'wb')
 pickle.dump(results, output)
-output.close()'''
+output.close()
 
 #print results
 # read python dict back from the file
@@ -98,9 +94,3 @@ pkl_file.close()'''
 
 print 'Performance: '
 print end - start
-
-'''for r in results.keys():
-	print results[r]'''
-
-'''for r in results.items():	
-	db.save({'author':r[0], 'termos': [{'termo':i,'frequencia':j} for i,j in OrderedDict(sorted(r[1][1].items(),key= lambda t: t[1],reverse=True)).items()]})'''
